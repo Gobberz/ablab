@@ -9,6 +9,8 @@
 **[Live demo →](https://gobberz.github.io/ablab/)**  ·  **[Download desktop app →](../../releases/latest)**
 
 ---
+![ABLab screenshot](docs/image.png)
+
 
 ## What it does
 
