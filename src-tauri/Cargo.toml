@@ -1,0 +1,23 @@
+[package]
+name = "ablab"
+version = "2.0.0"
+description = "A/B testing toolkit"
+authors = ["Artur Shaimardanov"]
+edition = "2021"
+rust-version = "1.70"
+
+[lib]
+name = "ablab_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[features]
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]

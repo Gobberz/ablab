@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <rect width="1024" height="1024" rx="180" fill="#0a0a0c"/>
+  <rect x="80" y="80" width="864" height="864" rx="120" fill="none" stroke="#26262e" stroke-width="2"/>
+  <!-- Bell curves overlapping (A vs B) -->
+  <g transform="translate(512, 560)">
+    <path d="M -340 100 Q -240 -280 -100 100 Z" fill="#60a5fa" opacity="0.45"/>
+    <path d="M 100 100 Q 240 -280 340 100 Z" fill="#d4f542" opacity="0.85"/>
+  </g>
+  <!-- Letters A B -->
+  <text x="512" y="380" font-family="Georgia, serif" font-size="280" font-style="italic" fill="#d4f542" text-anchor="middle" font-weight="400">A/B</text>
+  <!-- Subscript -->
+  <text x="512" y="850" font-family="monospace" font-size="80" fill="#7a7a85" text-anchor="middle" letter-spacing="20">LAB</text>
+</svg>

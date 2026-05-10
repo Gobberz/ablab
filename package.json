@@ -1,0 +1,21 @@
+{
+  "name": "ablab",
+  "version": "2.0.0",
+  "description": "Self-contained A/B testing toolkit for quantitative experiment design and inference",
+  "private": true,
+  "scripts": {
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.0.0"
+  },
+  "author": "Artur Shaimardanov",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Gobberz/ablab.git"
+  },
+  "homepage": "https://gobberz.github.io/ablab/"
+}

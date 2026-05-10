@@ -1,0 +1,1664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ABLab · Quant Edition</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0a0c;
+  --surface:#131318;
+  --surface-2:#1c1c23;
+  --border:#26262e;
+  --text:#f0f0f2;
+  --muted:#7a7a85;
+  --accent:#d4f542;
+  --accent-dim:#8ba82a;
+  --success:#4ade80;
+  --warn:#fbbf24;
+  --err:#f87171;
+  --blue:#60a5fa;
+  --purple:#c084fc;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:14px;line-height:1.5;min-height:100vh}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:radial-gradient(circle at 50% 0%,rgba(212,245,66,0.04) 0%,transparent 50%);
+}
+body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0.025;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.app{position:relative;z-index:1;max-width:1400px;margin:0 auto;padding:20px}
+
+header.hero{
+  border-bottom:1px solid var(--border);
+  padding:24px 0 20px;
+  margin-bottom:24px;
+  display:flex;justify-content:space-between;align-items:end;gap:20px;flex-wrap:wrap;
+}
+header.hero h1{
+  font-family:'Instrument Serif',serif;
+  font-weight:400;font-size:44px;line-height:1;letter-spacing:-0.02em;
+}
+header.hero h1 em{color:var(--accent);font-style:italic;font-weight:400}
+header.hero .sub{color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;margin-top:8px}
+header.hero .status{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);text-align:right}
+header.hero .status .dot{display:inline-block;width:6px;height:6px;background:var(--accent);border-radius:50%;margin-right:6px;box-shadow:0 0 8px var(--accent)}
+
+nav.tabs{
+  display:flex;gap:2px;flex-wrap:wrap;
+  border-bottom:1px solid var(--border);
+  margin-bottom:24px;
+}
+nav.tabs button{
+  background:transparent;border:none;color:var(--muted);
+  font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;
+  padding:10px 14px;cursor:pointer;letter-spacing:0.05em;text-transform:uppercase;
+  border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;
+}
+nav.tabs button:hover{color:var(--text)}
+nav.tabs button.active{color:var(--accent);border-bottom-color:var(--accent)}
+nav.tabs button .n{opacity:0.4;margin-right:6px}
+
+main section.panel{display:none;animation:fade .3s}
+main section.panel.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+.panel-head{margin-bottom:20px}
+.panel-head h2{font-family:'Instrument Serif',serif;font-size:32px;font-weight:400;letter-spacing:-0.01em}
+.panel-head p{color:var(--muted);font-size:13px;margin-top:4px;max-width:640px}
+
+.grid{display:grid;gap:16px}
+.grid.cols-2{grid-template-columns:1fr 1fr}
+.grid.cols-3{grid-template-columns:repeat(3,1fr)}
+.grid.cols-4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:900px){.grid.cols-2,.grid.cols-3,.grid.cols-4{grid-template-columns:1fr}}
+
+.card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  padding:20px;
+  border-radius:4px;
+  position:relative;
+}
+.card h3{
+  font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;
+  text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);
+  margin-bottom:16px;
+  display:flex;align-items:center;gap:8px;
+}
+.card h3::before{content:"";width:14px;height:1px;background:var(--accent)}
+
+label{display:block;font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:6px;margin-top:12px}
+label:first-child{margin-top:0}
+input[type=number],input[type=text],select,textarea{
+  width:100%;background:var(--surface-2);
+  border:1px solid var(--border);color:var(--text);
+  padding:9px 12px;font-family:'JetBrains Mono',monospace;font-size:13px;
+  border-radius:3px;outline:none;transition:border-color .15s;
+}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+textarea{min-height:100px;resize:vertical;line-height:1.4}
+input[type=file]{font-family:'IBM Plex Sans',sans-serif;font-size:12px;color:var(--muted)}
+.row{display:flex;gap:10px}
+.row > *{flex:1}
+
+button.btn{
+  background:var(--accent);color:#000;border:none;
+  padding:10px 18px;font-family:'JetBrains Mono',monospace;font-size:11px;
+  font-weight:700;text-transform:uppercase;letter-spacing:0.08em;cursor:pointer;
+  border-radius:3px;transition:all .15s;
+}
+button.btn:hover{background:#e8ff55;transform:translateY(-1px)}
+button.btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent-dim)}
+button.btn.ghost:hover{background:rgba(212,245,66,0.08)}
+button.btn.mini{padding:6px 10px;font-size:10px}
+
+.result{
+  margin-top:16px;padding:14px;
+  background:var(--bg);border:1px dashed var(--border);
+  border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:12px;
+}
+.result .key{color:var(--muted)}
+.result .val{color:var(--text);font-weight:500}
+.result .big{font-size:24px;color:var(--accent);font-weight:700;display:block;margin-top:2px;line-height:1.1}
+.result .verdict{margin-top:12px;padding:10px 12px;border-radius:3px;font-size:12px}
+.result .verdict.sig{background:rgba(74,222,128,0.1);color:var(--success);border-left:2px solid var(--success)}
+.result .verdict.nosig{background:rgba(248,113,113,0.08);color:var(--err);border-left:2px solid var(--err)}
+.result .verdict.warn{background:rgba(251,191,36,0.08);color:var(--warn);border-left:2px solid var(--warn)}
+.result table{width:100%;font-size:11px;border-collapse:collapse;margin-top:8px}
+.result table th,.result table td{padding:6px 8px;text-align:left;border-bottom:1px solid var(--border)}
+.result table th{color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:0.06em;font-size:9px}
+.result table tr:last-child td{border-bottom:none}
+
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:3px;overflow:hidden;margin-top:12px}
+.kpi{background:var(--surface-2);padding:12px 14px}
+.kpi .k{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px}
+.kpi .v{font-family:'JetBrains Mono',monospace;font-size:18px;color:var(--text);font-weight:500}
+.kpi .v.accent{color:var(--accent)}
+.kpi .v.ok{color:var(--success)}
+.kpi .v.bad{color:var(--err)}
+.kpi .v.warn{color:var(--warn)}
+
+svg.chart{width:100%;height:200px;display:block;margin-top:12px}
+svg.chart .axis{stroke:var(--border);stroke-width:1}
+svg.chart .grid-line{stroke:var(--border);stroke-width:1;stroke-dasharray:2,3;opacity:0.4}
+svg.chart text{fill:var(--muted);font-family:'JetBrains Mono',monospace;font-size:9px}
+svg.chart .curve-a{fill:none;stroke:var(--blue);stroke-width:2}
+svg.chart .curve-b{fill:none;stroke:var(--accent);stroke-width:2}
+svg.chart .fill-a{fill:var(--blue);opacity:0.15}
+svg.chart .fill-b{fill:var(--accent);opacity:0.15}
+
+.pill{display:inline-block;padding:2px 8px;border-radius:100px;font-family:'JetBrains Mono',monospace;font-size:9px;background:var(--surface-2);color:var(--muted);margin-right:4px;margin-top:4px;border:1px solid var(--border)}
+.pill.ok{color:var(--success);border-color:var(--success)}
+.pill.bad{color:var(--err);border-color:var(--err)}
+.pill.warn{color:var(--warn);border-color:var(--warn)}
+
+.data-preview{max-height:200px;overflow:auto;font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:10px;margin-top:10px}
+.data-preview table{width:100%;border-collapse:collapse}
+.data-preview th,.data-preview td{padding:3px 8px;text-align:right;white-space:nowrap}
+.data-preview th{color:var(--accent);border-bottom:1px solid var(--border);text-align:left;position:sticky;top:0;background:var(--bg)}
+.data-preview td{color:var(--text)}
+
+.info{padding:10px 12px;background:rgba(96,165,250,0.06);border-left:2px solid var(--blue);font-size:12px;color:var(--muted);margin-top:12px;border-radius:0 3px 3px 0;line-height:1.55}
+.info strong{color:var(--text)}
+.info code{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent);background:var(--surface);padding:1px 4px;border-radius:2px}
+
+.muted{color:var(--muted)}
+.mono{font-family:'JetBrains Mono',monospace}
+.accent{color:var(--accent)}
+
+footer.foot{margin-top:60px;padding:20px 0;border-top:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+</style>
+</head>
+<body>
+<div class="app">
+
+<header class="hero">
+  <div>
+    <h1>ABLab <em>Quant</em></h1>
+    <div class="sub">Experiment design & inference toolkit · v2.0</div>
+  </div>
+  <div class="status"><span class="dot"></span>engine ready · no deps · in-memory</div>
+</header>
+
+<nav class="tabs" id="tabs">
+  <button class="active" data-tab="data"><span class="n">01</span>Data</button>
+  <button data-tab="size"><span class="n">02</span>Sample Size</button>
+  <button data-tab="tests"><span class="n">03</span>Tests</button>
+  <button data-tab="backtest"><span class="n">04</span>Backtest</button>
+  <button data-tab="switchback"><span class="n">05</span>Switchback</button>
+  <button data-tab="cuped"><span class="n">06</span>CUPED / CUPAC</button>
+  <button data-tab="bayes"><span class="n">07</span>Bayesian</button>
+  <button data-tab="srm"><span class="n">08</span>SRM</button>
+  <button data-tab="seq"><span class="n">09</span>Sequential</button>
+  <button data-tab="multi"><span class="n">10</span>Multi Testing</button>
+  <button data-tab="ratio"><span class="n">11</span>Ratio Metrics</button>
+  <button data-tab="report"><span class="n">12</span>Report</button>
+</nav>
+
+<main>
+
+<!-- ==================== DATA TAB ==================== -->
+<section class="panel active" id="tab-data">
+  <div class="panel-head">
+    <h2>Data Input</h2>
+    <p>Upload a CSV, enter summary statistics manually, or generate synthetic data for AA simulations. Data lives in memory and is shared across all modules.</p>
+  </div>
+
+  <div class="grid cols-3">
+    <div class="card">
+      <h3>CSV Upload</h3>
+      <label>File (columns: group, metric, [covariate])</label>
+      <input type="file" id="csvFile" accept=".csv,.tsv,text/csv">
+      <label>Separator</label>
+      <select id="csvSep"><option value="auto">auto</option><option value=",">comma (,)</option><option value=";">semicolon (;)</option><option value="\t">tab</option></select>
+      <label style="margin-top:12px"><input type="checkbox" id="csvHeader" checked> first row is header</label>
+      <div id="csvPreview" class="data-preview" style="display:none"></div>
+    </div>
+
+    <div class="card">
+      <h3>Manual Summary</h3>
+      <label>Group A — mean / std / n</label>
+      <div class="row"><input type="number" id="mA" placeholder="mean" step="any" value="100"><input type="number" id="sA" placeholder="std" step="any" value="20"><input type="number" id="nA" placeholder="n" value="5000"></div>
+      <label>Group B — mean / std / n</label>
+      <div class="row"><input type="number" id="mB" placeholder="mean" step="any" value="102"><input type="number" id="sB" placeholder="std" step="any" value="20"><input type="number" id="nB" placeholder="n" value="5000"></div>
+      <label>Proportion A / B (optional, for z-prop)</label>
+      <div class="row"><input type="number" id="pA" placeholder="p_a (0–1)" step="0.0001" min="0" max="1"><input type="number" id="pB" placeholder="p_b (0–1)" step="0.0001" min="0" max="1"></div>
+      <button class="btn mini" onclick="saveManual()" style="margin-top:14px">Save as active</button>
+    </div>
+
+    <div class="card">
+      <h3>Synthetic Generator</h3>
+      <label>Distribution</label>
+      <select id="synDist"><option value="normal">Normal</option><option value="lognormal">Log-normal</option><option value="bernoulli">Bernoulli (conv)</option><option value="poisson">Poisson</option></select>
+      <label>n per group</label>
+      <input type="number" id="synN" value="5000">
+      <label>Base mean / param</label>
+      <input type="number" id="synMu" value="100" step="any">
+      <label>Std / second param</label>
+      <input type="number" id="synSigma" value="25" step="any">
+      <label>Effect size (lift, fraction)</label>
+      <input type="number" id="synLift" value="0.02" step="0.001">
+      <label><input type="checkbox" id="synCov" checked> add pre-period covariate (for CUPED)</label>
+      <button class="btn mini" onclick="generateSynthetic()" style="margin-top:12px">Generate</button>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h3>Active Dataset</h3>
+    <div id="activeInfo" class="muted mono" style="font-size:11px">no data</div>
+    <div id="activePreview" class="data-preview" style="display:none"></div>
+  </div>
+</section>
+
+<!-- ==================== SAMPLE SIZE TAB ==================== -->
+<section class="panel" id="tab-size">
+  <div class="panel-head">
+    <h2>Sample Size & MDE</h2>
+    <p>Required sample size for given α, β, and MDE. Or the inverse: what MDE will you detect at a given n.</p>
+  </div>
+
+  <div class="grid cols-2">
+    <div class="card">
+      <h3>Continuous Metric (Welch)</h3>
+      <label>Baseline mean (μ)</label><input type="number" id="ssMu" value="100" step="any">
+      <label>Baseline std (σ)</label><input type="number" id="ssSigma" value="25" step="any">
+      <label>MDE (absolute, in metric units)</label><input type="number" id="ssMde" value="1" step="any">
+      <label>α (two-sided) / Power (1-β)</label>
+      <div class="row"><input type="number" id="ssAlpha" value="0.05" step="0.01" min="0.001" max="0.2"><input type="number" id="ssPower" value="0.8" step="0.05" min="0.5" max="0.99"></div>
+      <label>Ratio n_B / n_A</label><input type="number" id="ssRatio" value="1" step="0.1" min="0.1">
+      <button class="btn" onclick="calcSampleContinuous()" style="margin-top:14px">Calculate</button>
+      <div id="ssContRes" class="result" style="display:none"></div>
+    </div>
+
+    <div class="card">
+      <h3>Proportion Metric (z-prop)</h3>
+      <label>Baseline p (0–1)</label><input type="number" id="ssP" value="0.1" step="0.001" min="0" max="1">
+      <label>MDE (relative, fraction)</label><input type="number" id="ssPmde" value="0.02" step="0.001">
+      <label>α (two-sided) / Power</label>
+      <div class="row"><input type="number" id="ssPalpha" value="0.05" step="0.01"><input type="number" id="ssPpower" value="0.8" step="0.05"></div>
+      <button class="btn" onclick="calcSampleProp()" style="margin-top:14px">Calculate</button>
+      <div id="ssPropRes" class="result" style="display:none"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h3>Reverse: MDE at given n</h3>
+    <div class="grid cols-4">
+      <div><label>Metric type</label><select id="revType"><option value="cont">Continuous</option><option value="prop">Proportion</option></select></div>
+      <div><label>n per group</label><input type="number" id="revN" value="5000"></div>
+      <div><label>σ (cont) / p (prop)</label><input type="number" id="revParam" value="25" step="any"></div>
+      <div><label>α / Power</label><div class="row"><input type="number" id="revAlpha" value="0.05" step="0.01"><input type="number" id="revPow" value="0.8" step="0.05"></div></div>
+    </div>
+    <button class="btn" onclick="calcReverseMde()" style="margin-top:14px">Find MDE</button>
+    <div id="revRes" class="result" style="display:none"></div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h3>Power Curve</h3>
+    <p class="muted" style="font-size:12px">Power as a function of n at fixed MDE — helps you see where it plateaus.</p>
+    <svg class="chart" id="powerChart" viewBox="0 0 600 220" preserveAspectRatio="none"></svg>
+    <button class="btn ghost mini" onclick="drawPowerCurve()">Draw from Continuous params</button>
+  </div>
+</section>
+
+<!-- ==================== TESTS TAB ==================== -->
+<section class="panel" id="tab-tests">
+  <div class="panel-head">
+    <h2>Statistical Tests</h2>
+    <p>Parametric and non-parametric tests on the active dataset or on summary statistics.</p>
+  </div>
+
+  <div class="card">
+    <h3>Run Test</h3>
+    <div class="row">
+      <div>
+        <label>Source</label>
+        <select id="tSource"><option value="active">Active dataset</option><option value="manual">Manual summary</option></select>
+      </div>
+      <div>
+        <label>Test</label>
+        <select id="tKind">
+          <option value="welch">Welch's t-test</option>
+          <option value="student">Student's t-test (equal var)</option>
+          <option value="mwu">Mann–Whitney U</option>
+          <option value="zprop">Z-test for proportions</option>
+          <option value="chi2">Chi-square 2x2</option>
+          <option value="boot">Bootstrap (diff of means)</option>
+        </select>
+      </div>
+      <div>
+        <label>α (two-sided)</label><input type="number" id="tAlpha" value="0.05" step="0.01">
+      </div>
+    </div>
+    <label style="margin-top:12px">Bootstrap iterations (if bootstrap selected)</label>
+    <input type="number" id="tBoot" value="5000" max="50000">
+    <button class="btn" onclick="runTest()" style="margin-top:14px">Run</button>
+    <div id="tRes" class="result" style="display:none"></div>
+  </div>
+</section>
+
+<!-- ==================== BACKTEST TAB ==================== -->
+<section class="panel" id="tab-backtest">
+  <div class="panel-head">
+    <h2>Backtest / A/A Simulation</h2>
+    <p>Repeated A/A splits on historical data → empirical FPR. If FPR drifts away from the nominal α, the test breaks its assumptions (heavy tails, clustering, dependencies).</p>
+  </div>
+
+  <div class="card">
+    <h3>Configuration</h3>
+    <div class="grid cols-3">
+      <div><label>Source column (active dataset)</label><select id="btMetricCol"><option>—</option></select></div>
+      <div><label>Iterations</label><input type="number" id="btIter" value="1000" max="20000"></div>
+      <div><label>Test</label><select id="btTest"><option value="welch">Welch</option><option value="student">Student</option><option value="mwu">Mann-Whitney</option></select></div>
+    </div>
+    <div class="grid cols-3" style="margin-top:8px">
+      <div><label>Split ratio A : rest</label><input type="number" id="btRatio" value="0.5" step="0.05" min="0.1" max="0.9"></div>
+      <div><label>α</label><input type="number" id="btAlpha" value="0.05" step="0.01"></div>
+      <div><label>Seed</label><input type="number" id="btSeed" value="42"></div>
+    </div>
+    <button class="btn" onclick="runBacktest()" style="margin-top:14px">Run backtest</button>
+    <div id="btRes" class="result" style="display:none"></div>
+    <svg class="chart" id="btChart" viewBox="0 0 600 220" preserveAspectRatio="none" style="display:none"></svg>
+  </div>
+</section>
+
+<!-- ==================== SWITCHBACK TAB ==================== -->
+<section class="panel" id="tab-switchback">
+  <div class="panel-head">
+    <h2>Switchback Design</h2>
+    <p>When per-user splits aren't possible (marketplaces, matching, pricing) — alternate A/B by time blocks. Account for carryover and autocorrelation.</p>
+  </div>
+
+  <div class="card">
+    <h3>Plan Blocks</h3>
+    <div class="grid cols-4">
+      <div><label>Horizon (hours)</label><input type="number" id="sbHours" value="168"></div>
+      <div><label>Block size (min)</label><input type="number" id="sbBlock" value="60"></div>
+      <div><label>Randomization</label><select id="sbRand"><option value="perm">Permuted blocks</option><option value="bern">Bernoulli</option><option value="latin">Latin square (day×hour)</option></select></div>
+      <div><label>Seed</label><input type="number" id="sbSeed" value="7"></div>
+    </div>
+    <div class="grid cols-3" style="margin-top:8px">
+      <div><label>Carryover buffer (min) — discard at block start</label><input type="number" id="sbBuf" value="10"></div>
+      <div><label>Expected MDE (% of metric)</label><input type="number" id="sbMde" value="0.02" step="0.001"></div>
+      <div><label>Hourly variation Σ (CV)</label><input type="number" id="sbCv" value="0.3" step="0.05"></div>
+    </div>
+    <button class="btn" onclick="planSwitchback()" style="margin-top:14px">Generate plan</button>
+    <div id="sbRes" class="result" style="display:none"></div>
+    <svg class="chart" id="sbChart" viewBox="0 0 600 120" preserveAspectRatio="none" style="display:none;height:140px"></svg>
+  </div>
+
+  <div class="info">
+    <strong>Good switchback rules:</strong> blocks ≥ system feedback time (car-driver match rate, price recomputation lag); discard the first N minutes of each block (carryover); for analysis use <code>cluster-robust SE</code> or block-bootstrap, otherwise SE is underestimated and FPR explodes.
+  </div>
+</section>
+
+<!-- ==================== CUPED TAB ==================== -->
+<section class="panel" id="tab-cuped">
+  <div class="panel-head">
+    <h2>Variance Reduction: CUPED / CUPAC</h2>
+    <p>CUPED subtracts the correlation between Y and a pre-experiment covariate X: <span class="mono accent">Y' = Y − θ·(X − E[X])</span>, where <span class="mono accent">θ = Cov(Y,X)/Var(X)</span>. CUPAC is the same idea, but X is an ML model prediction.</p>
+  </div>
+
+  <div class="card">
+    <h3>CUPED Adjustment</h3>
+    <div class="grid cols-3">
+      <div><label>Y column (metric)</label><select id="cpY"></select></div>
+      <div><label>X column (covariate / pre-period)</label><select id="cpX"></select></div>
+      <div><label>Group column</label><select id="cpG"></select></div>
+    </div>
+    <button class="btn" onclick="runCuped()" style="margin-top:14px">Run CUPED</button>
+    <div id="cpRes" class="result" style="display:none"></div>
+  </div>
+
+  <div class="info">
+    <strong>Pro tips:</strong> compute θ on <em>pooled</em> data (A+B) to avoid bias. Effectiveness ≈ 1−ρ²(Y,X). For ρ=0.5 variance drops by 25% → same power with 25% fewer users. CUPAC: train a gradient boosting model on historical Y without treatment and use the predictions as X.
+  </div>
+</section>
+
+<!-- ==================== BAYESIAN TAB ==================== -->
+<section class="panel" id="tab-bayes">
+  <div class="panel-head">
+    <h2>Bayesian Inference</h2>
+    <p>Beta-Binomial for conversions and Normal-Normal for means. Reports P(B&gt;A), expected loss, and credible intervals.</p>
+  </div>
+
+  <div class="grid cols-2">
+    <div class="card">
+      <h3>Beta-Binomial (Conversion)</h3>
+      <label>Prior α / β (Jeffreys = 0.5/0.5, flat = 1/1)</label>
+      <div class="row"><input type="number" id="baPriorA" value="1" step="0.5"><input type="number" id="baPriorB" value="1" step="0.5"></div>
+      <label>A: successes / trials</label>
+      <div class="row"><input type="number" id="baS_A" value="120"><input type="number" id="baN_A" value="1000"></div>
+      <label>B: successes / trials</label>
+      <div class="row"><input type="number" id="baS_B" value="145"><input type="number" id="baN_B" value="1000"></div>
+      <label>Samples (Monte Carlo)</label><input type="number" id="baSamples" value="20000">
+      <button class="btn" onclick="runBayesBeta()" style="margin-top:14px">Run</button>
+      <div id="baBetaRes" class="result" style="display:none"></div>
+      <svg class="chart" id="baBetaChart" viewBox="0 0 600 220" preserveAspectRatio="none" style="display:none"></svg>
+    </div>
+
+    <div class="card">
+      <h3>Normal-Normal (Continuous)</h3>
+      <label>A: mean / std / n</label>
+      <div class="row"><input type="number" id="bnM_A" value="100" step="any"><input type="number" id="bnS_A" value="20" step="any"><input type="number" id="bnN_A" value="1000"></div>
+      <label>B: mean / std / n</label>
+      <div class="row"><input type="number" id="bnM_B" value="102" step="any"><input type="number" id="bnS_B" value="20" step="any"><input type="number" id="bnN_B" value="1000"></div>
+      <label>Prior μ₀ / τ₀ (weak: 0 / 1e6)</label>
+      <div class="row"><input type="number" id="bnPriorMu" value="0" step="any"><input type="number" id="bnPriorTau" value="1000000" step="any"></div>
+      <label>Samples</label><input type="number" id="bnSamples" value="20000">
+      <button class="btn" onclick="runBayesNormal()" style="margin-top:14px">Run</button>
+      <div id="baNormRes" class="result" style="display:none"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== SRM TAB ==================== -->
+<section class="panel" id="tab-srm">
+  <div class="panel-head">
+    <h2>SRM — Sample Ratio Mismatch</h2>
+    <p>χ² test that the actual split matches the expected one. If p-value drops below ~0.001, your experiment is broken (data loss, bot filtering, bucketing bug). Stop the test.</p>
+  </div>
+
+  <div class="card">
+    <h3>Check Split</h3>
+    <label>Observed sizes (comma-separated)</label>
+    <input type="text" id="srmObs" value="10012, 9988">
+    <label>Expected proportions (sum = 1)</label>
+    <input type="text" id="srmExp" value="0.5, 0.5">
+    <button class="btn" onclick="runSrm()" style="margin-top:14px">Run χ²</button>
+    <div id="srmRes" class="result" style="display:none"></div>
+  </div>
+
+  <div class="info">
+    <strong>Threshold:</strong> industry standard is <code>p &lt; 0.0005</code> or <code>p &lt; 0.001</code>. Not 0.05, because with hundreds of experiments false alarms would burn out your team. Check SRM <em>every day</em>, not just at the end.
+  </div>
+</section>
+
+<!-- ==================== SEQUENTIAL TAB ==================== -->
+<section class="panel" id="tab-seq">
+  <div class="panel-head">
+    <h2>Sequential Testing</h2>
+    <p>SPRT and mSPRT let you "peek" at the experiment without inflating FPR — required for early stopping without a peeking penalty.</p>
+  </div>
+
+  <div class="card">
+    <h3>SPRT (Wald) — Proportion</h3>
+    <div class="grid cols-3">
+      <div><label>p₀ (null)</label><input type="number" id="spP0" value="0.1" step="0.001" min="0" max="1"></div>
+      <div><label>p₁ (alternative)</label><input type="number" id="spP1" value="0.12" step="0.001" min="0" max="1"></div>
+      <div><label>α / β</label><div class="row"><input type="number" id="spA" value="0.05" step="0.01"><input type="number" id="spB" value="0.2" step="0.01"></div></div>
+    </div>
+    <label>Observed: successes / trials (cumulative)</label>
+    <div class="row"><input type="number" id="spS" value="215"><input type="number" id="spN" value="2000"></div>
+    <button class="btn" onclick="runSprt()" style="margin-top:14px">Compute LLR</button>
+    <div id="spRes" class="result" style="display:none"></div>
+  </div>
+
+  <div class="info">
+    <strong>Stopping rules:</strong> accept H₁ if LLR &ge; log((1−β)/α); accept H₀ if LLR &le; log(β/(1−α)); otherwise — continue. Expected sample size is typically ≈ 50% of fixed-horizon.
+  </div>
+</section>
+
+<!-- ==================== MULTI TESTING TAB ==================== -->
+<section class="panel" id="tab-multi">
+  <div class="panel-head">
+    <h2>Multiple Testing Correction</h2>
+    <p>With k metrics tested simultaneously, FWER or FDR must be controlled. Paste a list of p-values to get adjusted ones.</p>
+  </div>
+
+  <div class="card">
+    <h3>Adjust p-values</h3>
+    <label>P-values (comma- or newline-separated)</label>
+    <textarea id="mtP" placeholder="0.001, 0.012, 0.034, 0.08, 0.15">0.001, 0.008, 0.039, 0.041, 0.045, 0.11, 0.20</textarea>
+    <label>Method</label>
+    <select id="mtMethod">
+      <option value="bonf">Bonferroni (FWER, conservative)</option>
+      <option value="holm">Holm-Bonferroni (FWER, uniformly better)</option>
+      <option value="bh">Benjamini-Hochberg (FDR)</option>
+      <option value="by">Benjamini-Yekutieli (FDR, dependence)</option>
+    </select>
+    <label>α</label><input type="number" id="mtAlpha" value="0.05" step="0.01">
+    <button class="btn" onclick="runMulti()" style="margin-top:14px">Adjust</button>
+    <div id="mtRes" class="result" style="display:none"></div>
+  </div>
+</section>
+
+<!-- ==================== RATIO TAB ==================== -->
+<section class="panel" id="tab-ratio">
+  <div class="panel-head">
+    <h2>Ratio Metrics (Delta Method)</h2>
+    <p>For metrics of the form <span class="mono accent">R = ΣX / ΣY</span> (revenue per user, CTR per session), the mean of user-level ratio is <em>biased</em> and SE is wrong. Use the delta method.</p>
+  </div>
+
+  <div class="card">
+    <h3>Inputs</h3>
+    <div class="grid cols-2">
+      <div>
+        <label>A: Σnum / Σden / n / Var(num) / Var(den) / Cov(num,den)</label>
+        <div class="row" style="flex-wrap:wrap"><input type="number" id="rA_num" value="50000" step="any"><input type="number" id="rA_den" value="10000" step="any"><input type="number" id="rA_n" value="10000"></div>
+        <div class="row" style="flex-wrap:wrap;margin-top:6px"><input type="number" id="rA_vn" value="1.5" step="any" placeholder="var(num)"><input type="number" id="rA_vd" value="2.0" step="any" placeholder="var(den)"><input type="number" id="rA_cov" value="1.2" step="any" placeholder="cov"></div>
+      </div>
+      <div>
+        <label>B: Σnum / Σden / n / Var(num) / Var(den) / Cov(num,den)</label>
+        <div class="row" style="flex-wrap:wrap"><input type="number" id="rB_num" value="51200" step="any"><input type="number" id="rB_den" value="10000" step="any"><input type="number" id="rB_n" value="10000"></div>
+        <div class="row" style="flex-wrap:wrap;margin-top:6px"><input type="number" id="rB_vn" value="1.5" step="any" placeholder="var(num)"><input type="number" id="rB_vd" value="2.0" step="any" placeholder="var(den)"><input type="number" id="rB_cov" value="1.2" step="any" placeholder="cov"></div>
+      </div>
+    </div>
+    <label>α</label><input type="number" id="rAlpha" value="0.05" step="0.01">
+    <button class="btn" onclick="runRatio()" style="margin-top:14px">Compute via Delta Method</button>
+    <div id="rRes" class="result" style="display:none"></div>
+  </div>
+
+  <div class="info">
+    <strong>Delta method:</strong> <span class="mono">Var(N/D) ≈ (1/D̄²)·Var(N) + (N̄²/D̄⁴)·Var(D) − 2(N̄/D̄³)·Cov(N,D)</span>. For clustered data (sessions within users) you need <em>cluster-level</em> variance.
+  </div>
+</section>
+
+<!-- ==================== REPORT TAB ==================== -->
+<section class="panel" id="tab-report">
+  <div class="panel-head">
+    <h2>Experiment Report</h2>
+    <p>Collect all completed calculations into a single Markdown / JSON dump for Confluence or Jira.</p>
+  </div>
+  <div class="card">
+    <h3>Run Log</h3>
+    <div id="reportLog" class="data-preview" style="min-height:240px;max-height:400px">— empty —</div>
+    <div style="margin-top:14px;display:flex;gap:8px">
+      <button class="btn" onclick="exportMarkdown()">Export Markdown</button>
+      <button class="btn ghost" onclick="exportJson()">Export JSON</button>
+      <button class="btn ghost" onclick="clearLog()">Clear</button>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div>ABLab / Quant Edition · vanilla JS · zero dependencies</div>
+  <div>built for rapid experiment iteration</div>
+</footer>
+
+</div>
+
+<script>
+/* =========================================================
+   STATISTICAL LIBRARY (vanilla, no deps)
+   ========================================================= */
+
+// --- Error function & normal ---
+function erf(x){
+  const sign = x<0?-1:1; x=Math.abs(x);
+  const a1=0.254829592,a2=-0.284496736,a3=1.421413741,a4=-1.453152027,a5=1.061405429,p=0.3275911;
+  const t=1/(1+p*x);
+  const y=1-(((((a5*t+a4)*t)+a3)*t+a2)*t+a1)*t*Math.exp(-x*x);
+  return sign*y;
+}
+const normCDF = (x,mu=0,sd=1) => 0.5*(1+erf((x-mu)/(sd*Math.SQRT2)));
+const normPDF = (x,mu=0,sd=1) => Math.exp(-0.5*((x-mu)/sd)**2)/(sd*Math.sqrt(2*Math.PI));
+
+// Inverse normal CDF (Beasley-Springer-Moro)
+function normInv(p,mu=0,sd=1){
+  if(p<=0||p>=1) return NaN;
+  const a=[-3.969683028665376e1,2.209460984245205e2,-2.759285104469687e2,1.383577518672690e2,-3.066479806614716e1,2.506628277459239];
+  const b=[-5.447609879822406e1,1.615858368580409e2,-1.556989798598866e2,6.680131188771972e1,-1.328068155288572e1];
+  const c=[-7.784894002430293e-3,-3.223964580411365e-1,-2.400758277161838,-2.549732539343734,4.374664141464968,2.938163982698783];
+  const d=[7.784695709041462e-3,3.224671290700398e-1,2.445134137142996,3.754408661907416];
+  const pl=0.02425, ph=1-pl;
+  let q,r,x;
+  if(p<pl){q=Math.sqrt(-2*Math.log(p));x=(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}
+  else if(p<=ph){q=p-0.5;r=q*q;x=(((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q/(((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);}
+  else{q=Math.sqrt(-2*Math.log(1-p));x=-(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}
+  return mu+sd*x;
+}
+
+// --- Student's t via Hill's approximation, good enough for df>1 ---
+function tCDF(t, df){
+  if(df<=0) return NaN;
+  // Use relation to beta incomplete via continued fraction
+  const x = df/(df+t*t);
+  const p = betaInc(df/2, 0.5, x)/2;
+  return t>=0 ? 1-p : p;
+}
+// Regularized incomplete beta (used for t, F, chi-square)
+function logGamma(z){
+  const g=7, c=[0.99999999999980993,676.5203681218851,-1259.1392167224028,771.32342877765313,-176.61502916214059,12.507343278686905,-0.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];
+  if(z<0.5) return Math.log(Math.PI/Math.sin(Math.PI*z))-logGamma(1-z);
+  z-=1; let x=c[0]; for(let i=1;i<g+2;i++) x+=c[i]/(z+i);
+  const t = z+g+0.5;
+  return 0.5*Math.log(2*Math.PI)+(z+0.5)*Math.log(t)-t+Math.log(x);
+}
+function betaInc(a,b,x){
+  if(x<=0) return 0; if(x>=1) return 1;
+  const bt = Math.exp(logGamma(a+b)-logGamma(a)-logGamma(b)+a*Math.log(x)+b*Math.log(1-x));
+  if(x < (a+1)/(a+b+2)) return bt*betaCF(a,b,x)/a;
+  return 1 - bt*betaCF(b,a,1-x)/b;
+}
+function betaCF(a,b,x){
+  const MAX=200, EPS=3e-7;
+  let qab=a+b, qap=a+1, qam=a-1, c=1, d=1-qab*x/qap;
+  if(Math.abs(d)<1e-30) d=1e-30; d=1/d; let h=d;
+  for(let m=1;m<=MAX;m++){
+    const m2=2*m;
+    let aa=m*(b-m)*x/((qam+m2)*(a+m2));
+    d=1+aa*d; if(Math.abs(d)<1e-30) d=1e-30; c=1+aa/c; if(Math.abs(c)<1e-30) c=1e-30; d=1/d; h*=d*c;
+    aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));
+    d=1+aa*d; if(Math.abs(d)<1e-30) d=1e-30; c=1+aa/c; if(Math.abs(c)<1e-30) c=1e-30; d=1/d;
+    const del=d*c; h*=del; if(Math.abs(del-1)<EPS) return h;
+  }
+  return h;
+}
+function tInv(p, df){
+  // Bisection on tCDF
+  let lo=-50, hi=50;
+  for(let i=0;i<100;i++){
+    const m=(lo+hi)/2; if(tCDF(m,df) < p) lo=m; else hi=m;
+    if(hi-lo<1e-6) break;
+  }
+  return (lo+hi)/2;
+}
+
+// Chi-square CDF (via gamma incomplete)
+function gammaP(s, x){
+  if(x<0||s<=0) return 0;
+  if(x<s+1){
+    // Series
+    let sum=1/s, term=sum;
+    for(let n=1;n<500;n++){ term*=x/(s+n); sum+=term; if(Math.abs(term)<1e-12) break; }
+    return sum*Math.exp(-x+s*Math.log(x)-logGamma(s));
+  } else {
+    // Continued fraction
+    let b=x+1-s, c=1e30, d=1/b, h=d;
+    for(let i=1;i<500;i++){
+      const an=-i*(i-s);
+      b+=2; d=an*d+b; if(Math.abs(d)<1e-30) d=1e-30;
+      c=b+an/c; if(Math.abs(c)<1e-30) c=1e-30;
+      d=1/d; const del=d*c; h*=del; if(Math.abs(del-1)<1e-12) break;
+    }
+    return 1-h*Math.exp(-x+s*Math.log(x)-logGamma(s));
+  }
+}
+const chiSqCDF = (x, df) => gammaP(df/2, x/2);
+
+// --- Summary helpers ---
+const sum = a=>a.reduce((s,v)=>s+v,0);
+const mean = a=>sum(a)/a.length;
+function variance(a, sample=true){
+  if(a.length<2) return 0;
+  const m=mean(a); let s=0; for(const v of a) s+=(v-m)*(v-m);
+  return s/(a.length-(sample?1:0));
+}
+const std = (a,sample=true)=>Math.sqrt(variance(a,sample));
+function covariance(a,b,sample=true){
+  const n=Math.min(a.length,b.length); const ma=mean(a), mb=mean(b);
+  let s=0; for(let i=0;i<n;i++) s+=(a[i]-ma)*(b[i]-mb);
+  return s/(n-(sample?1:0));
+}
+const correlation = (a,b)=> covariance(a,b)/(std(a)*std(b));
+
+// --- Tests ---
+function welch(a,b){
+  const ma=mean(a), mb=mean(b), va=variance(a), vb=variance(b);
+  const se = Math.sqrt(va/a.length + vb/b.length);
+  const diff = mb-ma;
+  const t = diff/se;
+  const df = (va/a.length + vb/b.length)**2 / ((va/a.length)**2/(a.length-1) + (vb/b.length)**2/(b.length-1));
+  const p = 2*(1-tCDF(Math.abs(t), df));
+  return {t, df, p, diff, se, ma, mb, va, vb};
+}
+function welchSummary(ma,sa,na, mb,sb,nb){
+  const se = Math.sqrt(sa*sa/na + sb*sb/nb);
+  const diff=mb-ma, t=diff/se;
+  const df = Math.pow(sa*sa/na+sb*sb/nb,2) / (Math.pow(sa*sa/na,2)/(na-1) + Math.pow(sb*sb/nb,2)/(nb-1));
+  const p=2*(1-tCDF(Math.abs(t),df));
+  return {t,df,p,diff,se,ma,mb};
+}
+function student(a,b){
+  const ma=mean(a), mb=mean(b), va=variance(a), vb=variance(b);
+  const sp = Math.sqrt(((a.length-1)*va+(b.length-1)*vb)/(a.length+b.length-2));
+  const se = sp*Math.sqrt(1/a.length+1/b.length);
+  const t = (mb-ma)/se, df=a.length+b.length-2;
+  const p=2*(1-tCDF(Math.abs(t),df));
+  return {t,df,p,diff:mb-ma,se,ma,mb};
+}
+function mannWhitney(a,b){
+  const na=a.length, nb=b.length;
+  const all = a.map(v=>({v,g:'a'})).concat(b.map(v=>({v,g:'b'})));
+  all.sort((x,y)=>x.v-y.v);
+  // Ranks with ties
+  let i=0; while(i<all.length){
+    let j=i; while(j<all.length-1 && all[j+1].v===all[i].v) j++;
+    const r=(i+1+j+1)/2;
+    for(let k=i;k<=j;k++) all[k].r=r;
+    i=j+1;
+  }
+  const Ra = all.filter(x=>x.g==='a').reduce((s,x)=>s+x.r,0);
+  const U1 = Ra - na*(na+1)/2;
+  const U2 = na*nb - U1;
+  const U = Math.min(U1,U2);
+  const mu = na*nb/2;
+  const sigma = Math.sqrt(na*nb*(na+nb+1)/12);
+  const z = (U-mu)/sigma;
+  const p = 2*(1-normCDF(Math.abs(z)));
+  return {U,z,p,U1,U2};
+}
+function zProp(sA,nA,sB,nB){
+  const pA=sA/nA, pB=sB/nB, p=(sA+sB)/(nA+nB);
+  const se = Math.sqrt(p*(1-p)*(1/nA+1/nB));
+  const z = (pB-pA)/se;
+  const pval = 2*(1-normCDF(Math.abs(z)));
+  return {pA,pB,z,p:pval,diff:pB-pA,se};
+}
+function chi2x2(a,b,c,d){ // a,b in row1 ; c,d in row2
+  const n=a+b+c+d;
+  const row1=a+b, row2=c+d, col1=a+c, col2=b+d;
+  const E = [[row1*col1/n,row1*col2/n],[row2*col1/n,row2*col2/n]];
+  let x2=0;
+  const obs=[[a,b],[c,d]];
+  for(let i=0;i<2;i++) for(let j=0;j<2;j++){
+    const e=E[i][j]; x2 += (obs[i][j]-e)*(obs[i][j]-e)/e;
+  }
+  const p = 1-chiSqCDF(x2,1);
+  return {x2,p,E};
+}
+function chiSqGoodness(obs, expProp){
+  const n = sum(obs);
+  let x2=0;
+  for(let i=0;i<obs.length;i++){
+    const e = n*expProp[i];
+    x2 += (obs[i]-e)*(obs[i]-e)/e;
+  }
+  const df = obs.length-1;
+  const p = 1-chiSqCDF(x2,df);
+  return {x2,df,p};
+}
+function bootstrap(a,b,iter=5000,alpha=0.05,seed=1){
+  const rng = mulberry32(seed);
+  const diffs=[];
+  for(let i=0;i<iter;i++){
+    let sa=0, sb=0;
+    for(let j=0;j<a.length;j++) sa+=a[Math.floor(rng()*a.length)];
+    for(let j=0;j<b.length;j++) sb+=b[Math.floor(rng()*b.length)];
+    diffs.push(sb/b.length - sa/a.length);
+  }
+  diffs.sort((x,y)=>x-y);
+  const lo = diffs[Math.floor(alpha/2*iter)];
+  const hi = diffs[Math.floor((1-alpha/2)*iter)];
+  const observed = mean(b)-mean(a);
+  const p = 2*Math.min(diffs.filter(d=>d<=0).length, diffs.filter(d=>d>=0).length)/iter;
+  return {observed, lo, hi, p};
+}
+
+// --- RNG (seedable) ---
+function mulberry32(a){return function(){let t=(a+=0x6D2B79F5)|0;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return ((t^(t>>>14))>>>0)/4294967296}}
+function gaussRng(rng){ // Box-Muller
+  let u=0,v=0; while(u===0) u=rng(); while(v===0) v=rng();
+  return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
+}
+
+// --- Sample size formulas ---
+function sampleSizeCont(mu, sigma, mde, alpha=0.05, power=0.8, ratio=1){
+  const za = normInv(1-alpha/2), zb = normInv(power);
+  const n1 = Math.pow(sigma*(za+zb)/mde, 2) * (1 + 1/ratio);
+  return {nA:Math.ceil(n1), nB:Math.ceil(n1*ratio), total:Math.ceil(n1)+Math.ceil(n1*ratio)};
+}
+function sampleSizeProp(p, relMde, alpha=0.05, power=0.8){
+  const p2 = p*(1+relMde);
+  const za = normInv(1-alpha/2), zb = normInv(power);
+  const pbar = (p+p2)/2;
+  const num = Math.pow(za*Math.sqrt(2*pbar*(1-pbar))+zb*Math.sqrt(p*(1-p)+p2*(1-p2)),2);
+  const n = num/Math.pow(p2-p,2);
+  return {n:Math.ceil(n), total:2*Math.ceil(n), pA:p, pB:p2};
+}
+function mdeContFromN(sigma,n,alpha=0.05,power=0.8){
+  return (normInv(1-alpha/2)+normInv(power))*sigma*Math.sqrt(2/n);
+}
+function mdePropFromN(p,n,alpha=0.05,power=0.8){
+  const za=normInv(1-alpha/2), zb=normInv(power);
+  // Solve: za*sqrt(2pq)+zb*sqrt(2pq) ≈ |p2-p|*sqrt(n)  (rough symmetric-var approx)
+  return (za+zb)*Math.sqrt(2*p*(1-p)/n)/p; // relative
+}
+function powerAtN(mu,sigma,mde,n,alpha=0.05){
+  const se = sigma*Math.sqrt(2/n);
+  const za = normInv(1-alpha/2);
+  return 1 - normCDF(za - mde/se) + normCDF(-za - mde/se);
+}
+
+// --- Beta sampling via inverse CDF (approx) / actually using ratio of gammas ---
+function gammaRng(shape, rng){
+  // Marsaglia-Tsang
+  if(shape<1){ return gammaRng(shape+1, rng)*Math.pow(rng(), 1/shape); }
+  const d = shape - 1/3, c = 1/Math.sqrt(9*d);
+  while(true){
+    let x, v;
+    do{ x = gaussRng(rng); v = 1+c*x; } while(v<=0);
+    v=v*v*v; const u=rng();
+    if(u < 1 - 0.0331*x*x*x*x) return d*v;
+    if(Math.log(u) < 0.5*x*x + d*(1-v+Math.log(v))) return d*v;
+  }
+}
+function betaRng(a,b,rng){ const x=gammaRng(a,rng); return x/(x+gammaRng(b,rng)); }
+
+// --- CSV parser (simple but handles quotes) ---
+function parseCSV(text, sep='auto', hasHeader=true){
+  if(sep==='auto'){
+    const firstLine = text.split(/\r?\n/)[0];
+    const commas = (firstLine.match(/,/g)||[]).length;
+    const semis = (firstLine.match(/;/g)||[]).length;
+    const tabs = (firstLine.match(/\t/g)||[]).length;
+    sep = tabs>=commas && tabs>=semis ? '\t' : semis>commas ? ';' : ',';
+  }
+  const lines = text.split(/\r?\n/).filter(l=>l.length);
+  const rows = lines.map(line=>{
+    const out=[]; let cur=''; let inQ=false;
+    for(let i=0;i<line.length;i++){
+      const ch=line[i];
+      if(inQ){ if(ch==='"'&&line[i+1]==='"'){cur+='"';i++;} else if(ch==='"'){inQ=false;} else cur+=ch; }
+      else{ if(ch==='"') inQ=true; else if(ch===sep){out.push(cur);cur='';} else cur+=ch; }
+    }
+    out.push(cur);
+    return out;
+  });
+  let headers = hasHeader ? rows.shift() : rows[0].map((_,i)=>`col_${i}`);
+  headers = headers.map(h=>h.trim());
+  const data = rows.map(r=>{
+    const obj={}; headers.forEach((h,i)=>{
+      const v = r[i]; const num = parseFloat(v);
+      obj[h] = (!isNaN(num) && v && v.trim() !== '') ? num : (v||'').trim();
+    }); return obj;
+  });
+  return {headers, data};
+}
+
+/* =========================================================
+   APP STATE
+   ========================================================= */
+const state = {
+  dataset: null,    // {headers, data}
+  manual: null,     // {mA,sA,nA,mB,sB,nB, pA,pB}
+  log: [],
+};
+function logRun(kind, payload){
+  state.log.push({ts:new Date().toISOString(), kind, payload});
+  renderLog();
+}
+function renderLog(){
+  const el=document.getElementById('reportLog');
+  if(!state.log.length){el.textContent='— empty —';return;}
+  el.innerHTML = '<table><tr><th>#</th><th>ts</th><th>kind</th><th>summary</th></tr>' +
+    state.log.map((r,i)=>`<tr><td>${i+1}</td><td>${r.ts.slice(11,19)}</td><td>${r.kind}</td><td>${escapeHtml(summarize(r.payload))}</td></tr>`).join('') +
+    '</table>';
+}
+function summarize(p){
+  try{
+    const items=[];
+    for(const k of Object.keys(p||{}).slice(0,6)){
+      let v = p[k];
+      if(typeof v==='number') v = Math.abs(v)<0.001?v.toExponential(2):v.toFixed(4);
+      if(typeof v==='object') continue;
+      items.push(`${k}=${v}`);
+    }
+    return items.join(' · ');
+  }catch(e){return ''}
+}
+function escapeHtml(s){return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
+
+/* =========================================================
+   TAB NAVIGATION
+   ========================================================= */
+document.getElementById('tabs').addEventListener('click', e=>{
+  const btn=e.target.closest('button[data-tab]'); if(!btn) return;
+  document.querySelectorAll('#tabs button').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('main .panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+});
+
+/* =========================================================
+   DATA TAB
+   ========================================================= */
+document.getElementById('csvFile').addEventListener('change', e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const sep = document.getElementById('csvSep').value;
+  const hasH = document.getElementById('csvHeader').checked;
+  const r = new FileReader();
+  r.onload = ev => {
+    try{
+      const parsed = parseCSV(ev.target.result, sep, hasH);
+      state.dataset = parsed;
+      document.getElementById('csvPreview').style.display='block';
+      renderTable('csvPreview', parsed, 30);
+      updateActive();
+      populateColumnSelectors();
+      logRun('csv.load', {rows: parsed.data.length, cols: parsed.headers.length, headers: parsed.headers.join(',')});
+    }catch(err){alert('Parse error: '+err.message);}
+  };
+  r.readAsText(f);
+});
+function saveManual(){
+  state.manual = {
+    mA:+document.getElementById('mA').value, sA:+document.getElementById('sA').value, nA:+document.getElementById('nA').value,
+    mB:+document.getElementById('mB').value, sB:+document.getElementById('sB').value, nB:+document.getElementById('nB').value,
+    pA:parseFloat(document.getElementById('pA').value), pB:parseFloat(document.getElementById('pB').value),
+  };
+  updateActive();
+  logRun('manual.save', state.manual);
+}
+function generateSynthetic(){
+  const dist = document.getElementById('synDist').value;
+  const n = +document.getElementById('synN').value;
+  const mu = +document.getElementById('synMu').value;
+  const s = +document.getElementById('synSigma').value;
+  const lift = +document.getElementById('synLift').value;
+  const addCov = document.getElementById('synCov').checked;
+  const rng = mulberry32(Date.now()%1e9);
+  const data=[];
+  const gen = (isB)=>{
+    let v;
+    if(dist==='normal'){
+      const base = mu*(isB?1+lift:1);
+      v = base + s*gaussRng(rng);
+    } else if(dist==='lognormal'){
+      const m = Math.log(mu*(isB?1+lift:1)) - 0.5*Math.log(1+(s/mu)**2);
+      const sd = Math.sqrt(Math.log(1+(s/mu)**2));
+      v = Math.exp(m + sd*gaussRng(rng));
+    } else if(dist==='bernoulli'){
+      const p = Math.min(0.999, mu*(isB?1+lift:1));
+      v = rng()<p ? 1 : 0;
+    } else { // poisson
+      const lam = mu*(isB?1+lift:1);
+      let L=Math.exp(-lam), k=0, pp=1;
+      do{k++; pp*=rng();}while(pp>L);
+      v = k-1;
+    }
+    return v;
+  };
+  for(let i=0;i<n;i++){
+    const rowA = {group:'A', metric:gen(false)};
+    const rowB = {group:'B', metric:gen(true)};
+    if(addCov){
+      // correlated covariate (e.g. last-week value)
+      const cA = mu + s*0.8*gaussRng(rng) + 0.5*(rowA.metric - mu);
+      const cB = mu + s*0.8*gaussRng(rng) + 0.5*(rowB.metric - mu);
+      rowA.pre = cA; rowB.pre = cB;
+    }
+    data.push(rowA); data.push(rowB);
+  }
+  const headers = addCov ? ['group','metric','pre'] : ['group','metric'];
+  state.dataset = {headers, data};
+  updateActive();
+  populateColumnSelectors();
+  logRun('synthetic.generate', {dist, n, mu, s, lift, cov:addCov});
+}
+function updateActive(){
+  const info=document.getElementById('activeInfo');
+  const prev=document.getElementById('activePreview');
+  if(state.dataset){
+    info.innerHTML = `<span class="accent">dataset</span> · ${state.dataset.data.length} rows · ${state.dataset.headers.length} cols · [${state.dataset.headers.join(', ')}]`;
+    prev.style.display='block';
+    renderTable('activePreview', state.dataset, 20);
+  } else if(state.manual){
+    info.innerHTML = `<span class="accent">manual summary</span> · A(μ=${state.manual.mA}, σ=${state.manual.sA}, n=${state.manual.nA}) · B(μ=${state.manual.mB}, σ=${state.manual.sB}, n=${state.manual.nB})`;
+    prev.style.display='none';
+  } else {
+    info.textContent='no data'; prev.style.display='none';
+  }
+}
+function renderTable(elId, parsed, limit=20){
+  const el=document.getElementById(elId);
+  const rows = parsed.data.slice(0, limit);
+  el.innerHTML = '<table><tr>'+parsed.headers.map(h=>`<th>${escapeHtml(h)}</th>`).join('')+'</tr>'+
+    rows.map(r=>'<tr>'+parsed.headers.map(h=>`<td>${typeof r[h]==='number'?r[h].toFixed(3):escapeHtml(String(r[h]??''))}</td>`).join('')+'</tr>').join('')+
+    `</table><div class="muted" style="margin-top:6px;font-size:10px">showing ${rows.length} / ${parsed.data.length}</div>`;
+}
+function populateColumnSelectors(){
+  const ids = ['btMetricCol','cpY','cpX','cpG'];
+  ids.forEach(id=>{
+    const el = document.getElementById(id); if(!el) return;
+    el.innerHTML = state.dataset ? state.dataset.headers.map(h=>`<option value="${h}">${h}</option>`).join('') : '<option>—</option>';
+  });
+  // defaults
+  if(state.dataset){
+    const h=state.dataset.headers;
+    if(h.includes('metric')){document.getElementById('btMetricCol').value='metric';document.getElementById('cpY').value='metric';}
+    if(h.includes('pre')) document.getElementById('cpX').value='pre';
+    if(h.includes('group')) document.getElementById('cpG').value='group';
+  }
+}
+
+/* =========================================================
+   SAMPLE SIZE TAB
+   ========================================================= */
+function calcSampleContinuous(){
+  const mu=+document.getElementById('ssMu').value;
+  const sigma=+document.getElementById('ssSigma').value;
+  const mde=+document.getElementById('ssMde').value;
+  const alpha=+document.getElementById('ssAlpha').value;
+  const power=+document.getElementById('ssPower').value;
+  const ratio=+document.getElementById('ssRatio').value;
+  const r = sampleSizeCont(mu,sigma,mde,alpha,power,ratio);
+  const el=document.getElementById('ssContRes'); el.style.display='block';
+  el.innerHTML = `
+    <div class="kpi-row">
+      <div class="kpi"><div class="k">n (A)</div><div class="v accent">${r.nA.toLocaleString()}</div></div>
+      <div class="kpi"><div class="k">n (B)</div><div class="v accent">${r.nB.toLocaleString()}</div></div>
+      <div class="kpi"><div class="k">total</div><div class="v">${r.total.toLocaleString()}</div></div>
+      <div class="kpi"><div class="k">relative MDE</div><div class="v">${(mde/mu*100).toFixed(2)}%</div></div>
+    </div>
+    <div style="margin-top:10px" class="muted">formula: n = (σ·(z_{α/2}+z_{β})/Δ)² · (1 + 1/k)</div>`;
+  logRun('samplesize.cont', {mu,sigma,mde,alpha,power,nA:r.nA,nB:r.nB});
+}
+function calcSampleProp(){
+  const p=+document.getElementById('ssP').value;
+  const relMde=+document.getElementById('ssPmde').value;
+  const alpha=+document.getElementById('ssPalpha').value;
+  const power=+document.getElementById('ssPpower').value;
+  const r = sampleSizeProp(p,relMde,alpha,power);
+  const el=document.getElementById('ssPropRes'); el.style.display='block';
+  el.innerHTML = `
+    <div class="kpi-row">
+      <div class="kpi"><div class="k">n per group</div><div class="v accent">${r.n.toLocaleString()}</div></div>
+      <div class="kpi"><div class="k">total</div><div class="v">${r.total.toLocaleString()}</div></div>
+      <div class="kpi"><div class="k">p_A → p_B</div><div class="v">${(r.pA*100).toFixed(2)}% → ${(r.pB*100).toFixed(2)}%</div></div>
+    </div>`;
+  logRun('samplesize.prop', {p,relMde,alpha,power,n:r.n});
+}
+function calcReverseMde(){
+  const type=document.getElementById('revType').value;
+  const n=+document.getElementById('revN').value;
+  const param=+document.getElementById('revParam').value;
+  const alpha=+document.getElementById('revAlpha').value;
+  const pow=+document.getElementById('revPow').value;
+  const el=document.getElementById('revRes'); el.style.display='block';
+  let body;
+  if(type==='cont'){
+    const mde = mdeContFromN(param,n,alpha,pow);
+    body = `<div class="kpi-row"><div class="kpi"><div class="k">MDE (abs)</div><div class="v accent">${mde.toFixed(4)}</div></div><div class="kpi"><div class="k">n per group</div><div class="v">${n.toLocaleString()}</div></div></div>`;
+  } else {
+    const rel = mdePropFromN(param,n,alpha,pow);
+    body = `<div class="kpi-row"><div class="kpi"><div class="k">MDE (rel)</div><div class="v accent">${(rel*100).toFixed(2)}%</div></div><div class="kpi"><div class="k">baseline p</div><div class="v">${(param*100).toFixed(2)}%</div></div></div>`;
+  }
+  el.innerHTML = body;
+  logRun('reverse.mde', {type,n,param,alpha,pow});
+}
+function drawPowerCurve(){
+  const mu=+document.getElementById('ssMu').value;
+  const sigma=+document.getElementById('ssSigma').value;
+  const mde=+document.getElementById('ssMde').value;
+  const alpha=+document.getElementById('ssAlpha').value;
+  const pts=[]; const nmin=100, nmax=+document.getElementById('ssMu').value*0+50000;
+  const steps=60;
+  for(let i=0;i<=steps;i++){
+    const n = Math.round(nmin + (nmax-nmin)*i/steps);
+    pts.push({n, p:powerAtN(mu,sigma,mde,n,alpha)});
+  }
+  const svg=document.getElementById('powerChart'); svg.innerHTML='';
+  const W=600,H=220, pad={l:40,r:20,t:10,b:30};
+  const xScale = n => pad.l + (W-pad.l-pad.r)*(n-nmin)/(nmax-nmin);
+  const yScale = p => H-pad.b - (H-pad.t-pad.b)*p;
+  // grid
+  for(let i=0;i<=5;i++){ const y=yScale(i/5);
+    svg.innerHTML += `<line class="grid-line" x1="${pad.l}" y1="${y}" x2="${W-pad.r}" y2="${y}"/><text x="8" y="${y+3}">${(i/5).toFixed(1)}</text>`;
+  }
+  svg.innerHTML += `<line class="axis" x1="${pad.l}" y1="${H-pad.b}" x2="${W-pad.r}" y2="${H-pad.b}"/>`;
+  for(let i=0;i<=5;i++){ const n=nmin+(nmax-nmin)*i/5; const x=xScale(n);
+    svg.innerHTML += `<text x="${x}" y="${H-pad.b+15}" text-anchor="middle">${(n/1000).toFixed(0)}k</text>`;
+  }
+  const path = pts.map((p,i)=>`${i?'L':'M'}${xScale(p.n)},${yScale(p.p)}`).join('');
+  svg.innerHTML += `<path class="curve-b" d="${path}"/>`;
+  // 0.8 line
+  svg.innerHTML += `<line stroke="${getComputedStyle(document.documentElement).getPropertyValue('--err')}" stroke-dasharray="3,3" stroke-width="1" x1="${pad.l}" y1="${yScale(0.8)}" x2="${W-pad.r}" y2="${yScale(0.8)}"/><text x="${W-pad.r-4}" y="${yScale(0.8)-4}" text-anchor="end" fill="#f87171">power=0.8</text>`;
+}
+
+/* =========================================================
+   TESTS TAB
+   ========================================================= */
+function getActiveGroupData(metricCol='metric', groupCol='group'){
+  if(!state.dataset) return null;
+  const a=[], b=[];
+  const m=metricCol, g=groupCol;
+  state.dataset.data.forEach(r=>{
+    const v = typeof r[m]==='number'?r[m]:parseFloat(r[m]);
+    if(isNaN(v)) return;
+    const grp = String(r[g]).trim().toLowerCase();
+    if(grp==='a'||grp==='0'||grp==='control') a.push(v);
+    else if(grp==='b'||grp==='1'||grp==='treatment'||grp==='variant') b.push(v);
+  });
+  return {a,b};
+}
+function runTest(){
+  const src=document.getElementById('tSource').value;
+  const kind=document.getElementById('tKind').value;
+  const alpha=+document.getElementById('tAlpha').value;
+  const boot=+document.getElementById('tBoot').value;
+  const el=document.getElementById('tRes'); el.style.display='block';
+  let r, title;
+  try{
+    if(src==='manual'){
+      if(!state.manual){el.innerHTML='<span class="verdict nosig">First save a manual summary on the Data tab</span>';return;}
+      const m=state.manual;
+      if(kind==='welch'||kind==='student'){
+        r = welchSummary(m.mA,m.sA,m.nA,m.mB,m.sB,m.nB);
+        title = kind==='welch'?'Welch\'s t-test (summary)':'t-test (summary)';
+      } else if(kind==='zprop'){
+        if(isNaN(m.pA)||isNaN(m.pB)){el.innerHTML='<span class="verdict nosig">pA and pB are required</span>';return;}
+        r = zProp(Math.round(m.pA*m.nA),m.nA,Math.round(m.pB*m.nB),m.nB);
+        title='Z-test for proportions';
+      } else if(kind==='chi2'){
+        if(isNaN(m.pA)||isNaN(m.pB)){el.innerHTML='<span class="verdict nosig">pA and pB are required</span>';return;}
+        const sa=Math.round(m.pA*m.nA), sb=Math.round(m.pB*m.nB);
+        r = chi2x2(sa, m.nA-sa, sb, m.nB-sb);
+        title='Chi-square 2x2';
+      } else {
+        el.innerHTML='<span class="verdict nosig">This test requires raw data (upload a CSV or generate synthetic)</span>'; return;
+      }
+    } else {
+      const d = getActiveGroupData();
+      if(!d || !d.a.length || !d.b.length){ el.innerHTML='<span class="verdict nosig">No data, or group/metric columns not found</span>'; return; }
+      if(kind==='welch'){r=welch(d.a,d.b); title='Welch\'s t-test';}
+      else if(kind==='student'){r=student(d.a,d.b); title='Student\'s t-test';}
+      else if(kind==='mwu'){r=mannWhitney(d.a,d.b); title='Mann-Whitney U';}
+      else if(kind==='boot'){r=bootstrap(d.a,d.b,boot,alpha); title=`Bootstrap (${boot} iter)`;}
+      else if(kind==='zprop'){
+        const sa=d.a.filter(v=>v>0).length, sb=d.b.filter(v=>v>0).length;
+        r = zProp(sa,d.a.length,sb,d.b.length); title='Z-test for proportions (from raw)';
+      }
+      else if(kind==='chi2'){
+        const sa=d.a.filter(v=>v>0).length, sb=d.b.filter(v=>v>0).length;
+        r = chi2x2(sa, d.a.length-sa, sb, d.b.length-sb); title='Chi-square 2x2';
+      }
+    }
+  }catch(e){ el.innerHTML='<span class="verdict nosig">Error: '+escapeHtml(e.message)+'</span>'; return; }
+  // render
+  let rows='';
+  for(const k of ['t','z','U','x2','df','diff','observed','se','ma','mb','pA','pB','lo','hi','p']){
+    if(r[k]!==undefined){
+      let v = r[k];
+      if(typeof v==='number') v = Math.abs(v)<1e-4 ? v.toExponential(3) : v.toFixed(6);
+      rows += `<tr><td class="key">${k}</td><td class="mono val">${v}</td></tr>`;
+    }
+  }
+  const sig = r.p!==undefined && r.p<alpha;
+  el.innerHTML = `<div class="mono accent" style="margin-bottom:8px">${title}</div><table>${rows}</table>` +
+    (r.p!==undefined ? `<div class="verdict ${sig?'sig':'nosig'}">${sig?'✓ significant':'✗ not significant'} at α=${alpha} (p=${r.p.toExponential(3)})</div>`:'');
+  logRun('test.'+kind, Object.assign({alpha, source:src}, r));
+}
+
+/* =========================================================
+   BACKTEST (A/A)
+   ========================================================= */
+function runBacktest(){
+  if(!state.dataset){alert('No dataset loaded'); return;}
+  const col=document.getElementById('btMetricCol').value;
+  const iter=+document.getElementById('btIter').value;
+  const test=document.getElementById('btTest').value;
+  const ratio=+document.getElementById('btRatio').value;
+  const alpha=+document.getElementById('btAlpha').value;
+  const seed=+document.getElementById('btSeed').value;
+  const values = state.dataset.data.map(r=>+r[col]).filter(v=>!isNaN(v));
+  if(values.length<20){alert('Not enough data'); return;}
+  const rng = mulberry32(seed);
+  const pvals=[]; let fp=0;
+  const el=document.getElementById('btRes'); el.style.display='block'; el.innerHTML='<div class="muted">running…</div>';
+  setTimeout(()=>{
+    for(let i=0;i<iter;i++){
+      const a=[], b=[];
+      for(const v of values){ if(rng()<ratio) a.push(v); else b.push(v); }
+      if(a.length<2||b.length<2) continue;
+      let p;
+      if(test==='welch') p = welch(a,b).p;
+      else if(test==='student') p = student(a,b).p;
+      else p = mannWhitney(a,b).p;
+      pvals.push(p); if(p<alpha) fp++;
+    }
+    const fpr = fp/pvals.length;
+    const lowerCi = fpr - 1.96*Math.sqrt(fpr*(1-fpr)/pvals.length);
+    const upperCi = fpr + 1.96*Math.sqrt(fpr*(1-fpr)/pvals.length);
+    const meanP = mean(pvals);
+    // KS distance from uniform
+    pvals.sort((x,y)=>x-y);
+    let maxDev=0;
+    for(let i=0;i<pvals.length;i++){
+      const emp = (i+1)/pvals.length;
+      const d = Math.abs(emp - pvals[i]);
+      if(d>maxDev) maxDev=d;
+    }
+    const okFpr = Math.abs(fpr-alpha) < 1.96*Math.sqrt(alpha*(1-alpha)/pvals.length);
+    el.innerHTML = `
+      <div class="kpi-row">
+        <div class="kpi"><div class="k">iterations</div><div class="v">${pvals.length}</div></div>
+        <div class="kpi"><div class="k">empirical FPR</div><div class="v ${okFpr?'ok':'bad'}">${(fpr*100).toFixed(2)}%</div></div>
+        <div class="kpi"><div class="k">95% CI</div><div class="v">[${(lowerCi*100).toFixed(2)}; ${(upperCi*100).toFixed(2)}]%</div></div>
+        <div class="kpi"><div class="k">mean(p)</div><div class="v">${meanP.toFixed(3)}</div></div>
+        <div class="kpi"><div class="k">KS vs Uniform</div><div class="v ${maxDev<0.05?'ok':'warn'}">${maxDev.toFixed(3)}</div></div>
+      </div>
+      <div class="verdict ${okFpr?'sig':'warn'}" style="margin-top:12px">${okFpr?`✓ FPR is statistically indistinguishable from α=${alpha} — test is calibrated`:`⚠ FPR differs significantly from α=${alpha} — test is miscalibrated for this data (heavy tails? outliers? dependencies?)`}</div>`;
+    drawPvalHistogram(pvals);
+    logRun('backtest.'+test, {iter:pvals.length, fpr, ks:maxDev, col});
+  }, 10);
+}
+function drawPvalHistogram(ps){
+  const svg=document.getElementById('btChart'); svg.style.display='block'; svg.innerHTML='';
+  const W=600,H=220, pad={l:40,r:20,t:10,b:30};
+  const bins=20; const counts=new Array(bins).fill(0);
+  for(const p of ps){ const b=Math.min(bins-1, Math.floor(p*bins)); counts[b]++; }
+  const maxC = Math.max(...counts, ps.length/bins*1.5);
+  const barW = (W-pad.l-pad.r)/bins;
+  svg.innerHTML += `<line class="axis" x1="${pad.l}" y1="${H-pad.b}" x2="${W-pad.r}" y2="${H-pad.b}"/>`;
+  for(let i=0;i<=5;i++){ const y=pad.t+(H-pad.t-pad.b)*(1-i/5); const v=Math.round(maxC*i/5);
+    svg.innerHTML += `<line class="grid-line" x1="${pad.l}" y1="${y}" x2="${W-pad.r}" y2="${y}"/><text x="8" y="${y+3}">${v}</text>`;
+  }
+  for(let i=0;i<bins;i++){
+    const x=pad.l+i*barW; const h=(counts[i]/maxC)*(H-pad.t-pad.b); const y=H-pad.b-h;
+    svg.innerHTML += `<rect x="${x+1}" y="${y}" width="${barW-2}" height="${h}" fill="var(--accent)" opacity="0.7"/>`;
+  }
+  // expected uniform
+  const yExp = H-pad.b - (ps.length/bins/maxC)*(H-pad.t-pad.b);
+  svg.innerHTML += `<line x1="${pad.l}" y1="${yExp}" x2="${W-pad.r}" y2="${yExp}" stroke="var(--err)" stroke-dasharray="3,3"/><text x="${W-pad.r-4}" y="${yExp-4}" text-anchor="end" fill="var(--err)">uniform expectation</text>`;
+  for(let i=0;i<=5;i++){ const x=pad.l+(W-pad.l-pad.r)*i/5; svg.innerHTML += `<text x="${x}" y="${H-pad.b+15}" text-anchor="middle">${(i/5).toFixed(1)}</text>`; }
+  svg.innerHTML += `<text x="${W/2}" y="${H-4}" text-anchor="middle" fill="var(--muted)">p-value</text>`;
+}
+
+/* =========================================================
+   SWITCHBACK
+   ========================================================= */
+function planSwitchback(){
+  const hrs=+document.getElementById('sbHours').value;
+  const block=+document.getElementById('sbBlock').value;
+  const rand=document.getElementById('sbRand').value;
+  const seed=+document.getElementById('sbSeed').value;
+  const buf=+document.getElementById('sbBuf').value;
+  const mde=+document.getElementById('sbMde').value;
+  const cv=+document.getElementById('sbCv').value;
+  const totalMin = hrs*60;
+  const nBlocks = Math.floor(totalMin/block);
+  const rng = mulberry32(seed);
+  const assign=[];
+  if(rand==='bern'){ for(let i=0;i<nBlocks;i++) assign.push(rng()<0.5?'A':'B'); }
+  else if(rand==='perm'){
+    // Balanced permuted blocks of size 2
+    for(let i=0;i<nBlocks;i+=2){ if(rng()<0.5){assign.push('A');assign.push('B');} else {assign.push('B');assign.push('A');} }
+    if(assign.length>nBlocks) assign.length=nBlocks;
+  } else { // latin
+    // day × hour → assign based on (d+h)%2
+    for(let i=0;i<nBlocks;i++){
+      const totalSoFar = i*block;
+      const d = Math.floor(totalSoFar/(24*60));
+      const h = Math.floor((totalSoFar%(24*60))/60);
+      assign.push(((d+h)%2)===0?'A':'B');
+    }
+  }
+  const nA = assign.filter(x=>x==='A').length;
+  const nB = assign.filter(x=>x==='B').length;
+  const usefulMin = (block-buf)*assign.length;
+  // crude power est: effective SE scales with sqrt(block_count) and inflated by autocorr (approx (1+cv)^2)
+  const effBlocks = assign.length/(1+cv*2);
+  const seRel = 1/Math.sqrt(effBlocks/2);
+  const za=1.96, zb=normInv(0.8);
+  const reqMdeRel = (za+zb)*seRel;
+  const el=document.getElementById('sbRes'); el.style.display='block';
+  el.innerHTML = `
+    <div class="kpi-row">
+      <div class="kpi"><div class="k">total blocks</div><div class="v">${nBlocks}</div></div>
+      <div class="kpi"><div class="k">A / B blocks</div><div class="v">${nA} / ${nB}</div></div>
+      <div class="kpi"><div class="k">useful minutes</div><div class="v">${(usefulMin/60).toFixed(1)}h</div></div>
+      <div class="kpi"><div class="k">effective blocks (autocorr)</div><div class="v">${effBlocks.toFixed(0)}</div></div>
+      <div class="kpi"><div class="k">detectable MDE (~80% pow)</div><div class="v ${reqMdeRel<mde?'ok':'bad'}">${(reqMdeRel*100).toFixed(2)}%</div></div>
+      <div class="kpi"><div class="k">target MDE</div><div class="v">${(mde*100).toFixed(2)}%</div></div>
+    </div>`;
+  drawSwitchback(assign, buf, block);
+  logRun('switchback.plan',{hrs,block,rand,nBlocks,nA,nB});
+}
+function drawSwitchback(assign, buf, block){
+  const svg=document.getElementById('sbChart'); svg.style.display='block'; svg.innerHTML='';
+  const W=600,H=140, pad={l:40,r:20,t:20,b:20};
+  const show = Math.min(100, assign.length);
+  const cellW = (W-pad.l-pad.r)/show;
+  for(let i=0;i<show;i++){
+    const col = assign[i]==='A' ? 'var(--blue)' : 'var(--accent)';
+    svg.innerHTML += `<rect x="${pad.l+i*cellW}" y="${pad.t+20}" width="${cellW-1}" height="40" fill="${col}" opacity="0.8"/>`;
+    // buffer marker
+    if(buf>0) svg.innerHTML += `<rect x="${pad.l+i*cellW}" y="${pad.t+20}" width="${cellW*(buf/block)}" height="40" fill="var(--bg)" opacity="0.5"/>`;
+  }
+  svg.innerHTML += `<text x="${pad.l}" y="${pad.t+12}">A</text><rect x="${pad.l+18}" y="${pad.t+5}" width="10" height="8" fill="var(--blue)"/>`;
+  svg.innerHTML += `<text x="${pad.l+40}" y="${pad.t+12}">B</text><rect x="${pad.l+58}" y="${pad.t+5}" width="10" height="8" fill="var(--accent)"/>`;
+  svg.innerHTML += `<text x="${pad.l+90}" y="${pad.t+12}" fill="var(--muted)">dark = carryover buffer</text>`;
+  svg.innerHTML += `<text x="${pad.l}" y="${H-5}" fill="var(--muted)">first ${show} blocks · block=${block}min, buffer=${buf}min</text>`;
+}
+
+/* =========================================================
+   CUPED / CUPAC
+   ========================================================= */
+function runCuped(){
+  if(!state.dataset){alert('No dataset loaded'); return;}
+  const yCol=document.getElementById('cpY').value;
+  const xCol=document.getElementById('cpX').value;
+  const gCol=document.getElementById('cpG').value;
+  const rows = state.dataset.data.map(r=>({
+    y:+r[yCol], x:+r[xCol], g:String(r[gCol]).trim().toLowerCase()
+  })).filter(r=>!isNaN(r.y)&&!isNaN(r.x));
+  if(rows.length<20){alert('Not enough data'); return;}
+  // pooled theta
+  const ys = rows.map(r=>r.y), xs = rows.map(r=>r.x);
+  const mx = mean(xs), vx = variance(xs);
+  const theta = covariance(ys,xs)/vx;
+  const r2 = Math.pow(correlation(ys,xs),2);
+  // adjusted Y
+  rows.forEach(r=>{ r.yAdj = r.y - theta*(r.x - mx); });
+  const groupA = rows.filter(r=>['a','0','control'].includes(r.g));
+  const groupB = rows.filter(r=>['b','1','treatment','variant'].includes(r.g));
+  if(!groupA.length||!groupB.length){alert('Groups not found (expected a/b)'); return;}
+  const origA = groupA.map(r=>r.y), origB = groupB.map(r=>r.y);
+  const adjA = groupA.map(r=>r.yAdj), adjB = groupB.map(r=>r.yAdj);
+  const tOrig = welch(origA, origB);
+  const tAdj = welch(adjA, adjB);
+  const varRed = 1 - (variance(adjA)+variance(adjB))/(variance(origA)+variance(origB));
+  const el=document.getElementById('cpRes'); el.style.display='block';
+  el.innerHTML = `
+    <div class="kpi-row">
+      <div class="kpi"><div class="k">θ (pooled)</div><div class="v">${theta.toFixed(4)}</div></div>
+      <div class="kpi"><div class="k">ρ²(Y,X)</div><div class="v accent">${r2.toFixed(3)}</div></div>
+      <div class="kpi"><div class="k">var reduction</div><div class="v accent">${(varRed*100).toFixed(1)}%</div></div>
+      <div class="kpi"><div class="k">effective n boost</div><div class="v ok">×${(1/(1-varRed)).toFixed(2)}</div></div>
+    </div>
+    <table style="margin-top:12px">
+      <tr><th></th><th>diff</th><th>SE</th><th>t</th><th>p-value</th></tr>
+      <tr><td class="key">raw Y</td><td class="mono">${tOrig.diff.toFixed(4)}</td><td class="mono">${tOrig.se.toFixed(4)}</td><td class="mono">${tOrig.t.toFixed(3)}</td><td class="mono ${tOrig.p<0.05?'accent':''}">${tOrig.p.toExponential(3)}</td></tr>
+      <tr><td class="key accent">CUPED Y'</td><td class="mono">${tAdj.diff.toFixed(4)}</td><td class="mono">${tAdj.se.toFixed(4)}</td><td class="mono">${tAdj.t.toFixed(3)}</td><td class="mono ${tAdj.p<0.05?'accent':''}">${tAdj.p.toExponential(3)}</td></tr>
+    </table>`;
+  logRun('cuped', {theta, r2, varRed, pOrig:tOrig.p, pAdj:tAdj.p});
+}
+
+/* =========================================================
+   BAYESIAN
+   ========================================================= */
+function runBayesBeta(){
+  const pa=+document.getElementById('baPriorA').value, pb=+document.getElementById('baPriorB').value;
+  const sA=+document.getElementById('baS_A').value, nA=+document.getElementById('baN_A').value;
+  const sB=+document.getElementById('baS_B').value, nB=+document.getElementById('baN_B').value;
+  const N=+document.getElementById('baSamples').value;
+  const rng = mulberry32(7);
+  const postA_a=pa+sA, postA_b=pb+nA-sA;
+  const postB_a=pa+sB, postB_b=pb+nB-sB;
+  let bGreater=0, lossA=0, lossB=0;
+  const samplesA=[], samplesB=[];
+  for(let i=0;i<N;i++){
+    const xa = betaRng(postA_a, postA_b, rng);
+    const xb = betaRng(postB_a, postB_b, rng);
+    samplesA.push(xa); samplesB.push(xb);
+    if(xb>xa) bGreater++;
+    lossA += Math.max(xb-xa, 0); // loss of picking A if B is actually better
+    lossB += Math.max(xa-xb, 0);
+  }
+  const pB = bGreater/N, pA=1-pB;
+  samplesA.sort((x,y)=>x-y); samplesB.sort((x,y)=>x-y);
+  const ciA=[samplesA[Math.floor(N*0.025)], samplesA[Math.floor(N*0.975)]];
+  const ciB=[samplesB[Math.floor(N*0.025)], samplesB[Math.floor(N*0.975)]];
+  const lift = samplesB.map((v,i)=>v/samplesA[i]-1).sort((x,y)=>x-y);
+  const liftCi = [lift[Math.floor(N*0.025)], lift[Math.floor(N*0.975)]];
+  const meanLift = mean(lift);
+  const el=document.getElementById('baBetaRes'); el.style.display='block';
+  el.innerHTML = `
+    <div class="kpi-row">
+      <div class="kpi"><div class="k">P(B &gt; A)</div><div class="v accent">${(pB*100).toFixed(2)}%</div></div>
+      <div class="kpi"><div class="k">E[lift]</div><div class="v">${(meanLift*100).toFixed(2)}%</div></div>
+      <div class="kpi"><div class="k">95% lift CI</div><div class="v">[${(liftCi[0]*100).toFixed(2)}; ${(liftCi[1]*100).toFixed(2)}]%</div></div>
+      <div class="kpi"><div class="k">E[loss | pick A]</div><div class="v">${(lossA/N*100).toFixed(4)}%</div></div>
+      <div class="kpi"><div class="k">E[loss | pick B]</div><div class="v">${(lossB/N*100).toFixed(4)}%</div></div>
+    </div>
+    <table style="margin-top:10px">
+      <tr><th></th><th>mean</th><th>95% CI</th></tr>
+      <tr><td class="key">A (posterior)</td><td class="mono">${mean(samplesA).toFixed(4)}</td><td class="mono">[${ciA[0].toFixed(4)}; ${ciA[1].toFixed(4)}]</td></tr>
+      <tr><td class="key accent">B (posterior)</td><td class="mono">${mean(samplesB).toFixed(4)}</td><td class="mono">[${ciB[0].toFixed(4)}; ${ciB[1].toFixed(4)}]</td></tr>
+    </table>`;
+  drawBetaPosterior(postA_a, postA_b, postB_a, postB_b);
+  logRun('bayes.beta', {pB, meanLift, lossA:lossA/N, lossB:lossB/N});
+}
+function drawBetaPosterior(aA,bA, aB,bB){
+  const svg=document.getElementById('baBetaChart'); svg.style.display='block'; svg.innerHTML='';
+  const W=600,H=220, pad={l:40,r:20,t:10,b:30};
+  // find plausible range
+  const muA=aA/(aA+bA), muB=aB/(aB+bB);
+  const sdA=Math.sqrt(aA*bA/((aA+bA)*(aA+bA)*(aA+bA+1)));
+  const sdB=Math.sqrt(aB*bB/((aB+bB)*(aB+bB)*(aB+bB+1)));
+  const lo = Math.max(0, Math.min(muA-4*sdA, muB-4*sdB));
+  const hi = Math.min(1, Math.max(muA+4*sdA, muB+4*sdB));
+  const K=200;
+  const ptsA=[], ptsB=[];
+  // unnormalized beta PDF via log
+  function logBetaPdf(x,a,b){ if(x<=0||x>=1) return -Infinity;
+    return (a-1)*Math.log(x) + (b-1)*Math.log(1-x) - (logGamma(a)+logGamma(b)-logGamma(a+b));
+  }
+  let maxY=0;
+  for(let i=0;i<=K;i++){
+    const x = lo + (hi-lo)*i/K;
+    const yA = Math.exp(logBetaPdf(x,aA,bA));
+    const yB = Math.exp(logBetaPdf(x,aB,bB));
+    ptsA.push({x,y:yA}); ptsB.push({x,y:yB});
+    if(yA>maxY) maxY=yA; if(yB>maxY) maxY=yB;
+  }
+  const sx = x => pad.l + (W-pad.l-pad.r)*(x-lo)/(hi-lo);
+  const sy = y => H-pad.b - (H-pad.t-pad.b)*y/maxY;
+  // axes
+  svg.innerHTML += `<line class="axis" x1="${pad.l}" y1="${H-pad.b}" x2="${W-pad.r}" y2="${H-pad.b}"/>`;
+  for(let i=0;i<=5;i++){ const x=lo+(hi-lo)*i/5; svg.innerHTML += `<text x="${sx(x)}" y="${H-pad.b+15}" text-anchor="middle">${x.toFixed(3)}</text>`; }
+  const pathA = ptsA.map((p,i)=>`${i?'L':'M'}${sx(p.x)},${sy(p.y)}`).join('') + `L${sx(hi)},${H-pad.b}L${sx(lo)},${H-pad.b}Z`;
+  const pathB = ptsB.map((p,i)=>`${i?'L':'M'}${sx(p.x)},${sy(p.y)}`).join('') + `L${sx(hi)},${H-pad.b}L${sx(lo)},${H-pad.b}Z`;
+  svg.innerHTML += `<path class="fill-a" d="${pathA}"/><path class="fill-b" d="${pathB}"/>`;
+  svg.innerHTML += `<path class="curve-a" d="${ptsA.map((p,i)=>`${i?'L':'M'}${sx(p.x)},${sy(p.y)}`).join('')}"/>`;
+  svg.innerHTML += `<path class="curve-b" d="${ptsB.map((p,i)=>`${i?'L':'M'}${sx(p.x)},${sy(p.y)}`).join('')}"/>`;
+  svg.innerHTML += `<text x="${W-pad.r-4}" y="${pad.t+12}" text-anchor="end"><tspan fill="var(--blue)">■ A posterior</tspan> <tspan fill="var(--accent)">■ B posterior</tspan></text>`;
+}
+function runBayesNormal(){
+  const mA=+document.getElementById('bnM_A').value, sA=+document.getElementById('bnS_A').value, nA=+document.getElementById('bnN_A').value;
+  const mB=+document.getElementById('bnM_B').value, sB=+document.getElementById('bnS_B').value, nB=+document.getElementById('bnN_B').value;
+  const mu0=+document.getElementById('bnPriorMu').value, tau0=+document.getElementById('bnPriorTau').value;
+  const N=+document.getElementById('bnSamples').value;
+  // Posterior for mean (normal-normal, sigma known)
+  // precision_post = 1/tau0 + n/sigma^2
+  const prec0 = 1/tau0;
+  const precA = prec0 + nA/(sA*sA);
+  const postMuA = (mu0*prec0 + mA*nA/(sA*sA))/precA;
+  const postSdA = Math.sqrt(1/precA);
+  const precB = prec0 + nB/(sB*sB);
+  const postMuB = (mu0*prec0 + mB*nB/(sB*sB))/precB;
+  const postSdB = Math.sqrt(1/precB);
+  const rng = mulberry32(11);
+  let bGreater=0, lossA=0, lossB=0; const diffs=[];
+  for(let i=0;i<N;i++){
+    const xa = postMuA + postSdA*gaussRng(rng);
+    const xb = postMuB + postSdB*gaussRng(rng);
+    const d = xb-xa; diffs.push(d);
+    if(d>0) bGreater++;
+    lossA += Math.max(d,0); lossB += Math.max(-d,0);
+  }
+  diffs.sort((x,y)=>x-y);
+  const ci = [diffs[Math.floor(N*0.025)], diffs[Math.floor(N*0.975)]];
+  const el=document.getElementById('baNormRes'); el.style.display='block';
+  el.innerHTML = `
+    <div class="kpi-row">
+      <div class="kpi"><div class="k">P(B &gt; A)</div><div class="v accent">${(bGreater/N*100).toFixed(2)}%</div></div>
+      <div class="kpi"><div class="k">E[B−A]</div><div class="v">${mean(diffs).toFixed(4)}</div></div>
+      <div class="kpi"><div class="k">95% diff CI</div><div class="v">[${ci[0].toFixed(3)}; ${ci[1].toFixed(3)}]</div></div>
+      <div class="kpi"><div class="k">E[loss pick A]</div><div class="v">${(lossA/N).toFixed(5)}</div></div>
+      <div class="kpi"><div class="k">E[loss pick B]</div><div class="v">${(lossB/N).toFixed(5)}</div></div>
+    </div>
+    <table style="margin-top:10px">
+      <tr><th></th><th>μ posterior</th><th>σ posterior</th></tr>
+      <tr><td class="key">A</td><td class="mono">${postMuA.toFixed(4)}</td><td class="mono">${postSdA.toFixed(4)}</td></tr>
+      <tr><td class="key accent">B</td><td class="mono">${postMuB.toFixed(4)}</td><td class="mono">${postSdB.toFixed(4)}</td></tr>
+    </table>`;
+  logRun('bayes.normal', {pB:bGreater/N, meanDiff:mean(diffs), ci});
+}
+
+/* =========================================================
+   SRM
+   ========================================================= */
+function runSrm(){
+  const obs = document.getElementById('srmObs').value.split(',').map(s=>+s.trim()).filter(v=>!isNaN(v));
+  const exp = document.getElementById('srmExp').value.split(',').map(s=>+s.trim()).filter(v=>!isNaN(v));
+  if(obs.length!==exp.length){alert('Sizes do not match'); return;}
+  const sumExp = sum(exp); exp.forEach((v,i,a)=>a[i]=v/sumExp);
+  const r = chiSqGoodness(obs, exp);
+  const el=document.getElementById('srmRes'); el.style.display='block';
+  const severity = r.p<0.0005?'bad':r.p<0.01?'warn':'ok';
+  el.innerHTML = `
+    <div class="kpi-row">
+      <div class="kpi"><div class="k">χ²</div><div class="v">${r.x2.toFixed(3)}</div></div>
+      <div class="kpi"><div class="k">df</div><div class="v">${r.df}</div></div>
+      <div class="kpi"><div class="k">p-value</div><div class="v ${severity==='bad'?'bad':severity==='warn'?'warn':'ok'}">${r.p.toExponential(3)}</div></div>
+      <div class="kpi"><div class="k">total n</div><div class="v">${sum(obs).toLocaleString()}</div></div>
+    </div>
+    <div class="verdict ${severity==='bad'?'nosig':severity==='warn'?'warn':'sig'}" style="margin-top:12px">${
+      severity==='bad' ? '⚠ SRM detected (p < 0.0005). Experiment is broken — do not trust the results.' :
+      severity==='warn' ? '⚠ borderline (0.0005 ≤ p < 0.01). Investigate the cause.' :
+      '✓ splits consistent with expected ratio'
+    }</div>`;
+  logRun('srm', {x2:r.x2, p:r.p, obs:obs.join(','), exp:exp.map(v=>v.toFixed(3)).join(',')});
+}
+
+/* =========================================================
+   SEQUENTIAL (SPRT for proportions)
+   ========================================================= */
+function runSprt(){
+  const p0=+document.getElementById('spP0').value;
+  const p1=+document.getElementById('spP1').value;
+  const alpha=+document.getElementById('spA').value;
+  const beta=+document.getElementById('spB').value;
+  const s=+document.getElementById('spS').value;
+  const n=+document.getElementById('spN').value;
+  // LLR under Bernoulli: s*log(p1/p0) + (n-s)*log((1-p1)/(1-p0))
+  const llr = s*Math.log(p1/p0) + (n-s)*Math.log((1-p1)/(1-p0));
+  const upper = Math.log((1-beta)/alpha);
+  const lower = Math.log(beta/(1-alpha));
+  // Wald approx expected sample size under H1
+  const d1 = p1*Math.log(p1/p0) + (1-p1)*Math.log((1-p1)/(1-p0));
+  const ess1 = (1-beta)*Math.log((1-beta)/alpha)/d1 + beta*Math.log(beta/(1-alpha))/d1;
+  const el=document.getElementById('spRes'); el.style.display='block';
+  const decision = llr>=upper ? 'accept H1 (stop, effect)' : llr<=lower ? 'accept H0 (stop, no effect)' : 'continue (not enough evidence)';
+  const verdict = llr>=upper ? 'sig' : llr<=lower ? 'nosig' : 'warn';
+  el.innerHTML = `
+    <div class="kpi-row">
+      <div class="kpi"><div class="k">LLR</div><div class="v accent">${llr.toFixed(3)}</div></div>
+      <div class="kpi"><div class="k">upper boundary</div><div class="v">${upper.toFixed(3)}</div></div>
+      <div class="kpi"><div class="k">lower boundary</div><div class="v">${lower.toFixed(3)}</div></div>
+      <div class="kpi"><div class="k">E[n | H1]</div><div class="v">${Math.round(Math.abs(ess1)).toLocaleString()}</div></div>
+      <div class="kpi"><div class="k">observed p</div><div class="v">${(s/n*100).toFixed(2)}%</div></div>
+    </div>
+    <div class="verdict ${verdict}" style="margin-top:12px">${decision}</div>`;
+  logRun('sprt', {llr, upper, lower, decision});
+}
+
+/* =========================================================
+   MULTIPLE TESTING
+   ========================================================= */
+function runMulti(){
+  const raw = document.getElementById('mtP').value;
+  const ps = raw.split(/[,\s\n]+/).map(s=>s.trim()).filter(s=>s).map(Number).filter(v=>!isNaN(v));
+  if(!ps.length){alert('Paste p-values first'); return;}
+  const m=document.getElementById('mtMethod').value;
+  const alpha=+document.getElementById('mtAlpha').value;
+  const k=ps.length;
+  const indexed = ps.map((p,i)=>({p,i,orig:p}));
+  indexed.sort((a,b)=>a.p-b.p);
+  let adj;
+  if(m==='bonf'){
+    adj = indexed.map(x=>({...x, adj:Math.min(1, x.p*k)}));
+  } else if(m==='holm'){
+    adj = indexed.map((x,i)=>({...x, adj:Math.min(1, x.p*(k-i))}));
+    // enforce monotonicity
+    for(let i=1;i<adj.length;i++) if(adj[i].adj<adj[i-1].adj) adj[i].adj=adj[i-1].adj;
+  } else if(m==='bh'){
+    adj = indexed.map((x,i)=>({...x, adj:Math.min(1, x.p*k/(i+1))}));
+    for(let i=adj.length-2;i>=0;i--) if(adj[i].adj>adj[i+1].adj) adj[i].adj=adj[i+1].adj;
+  } else { // BY
+    let c=0; for(let i=1;i<=k;i++) c+=1/i;
+    adj = indexed.map((x,i)=>({...x, adj:Math.min(1, x.p*k*c/(i+1))}));
+    for(let i=adj.length-2;i>=0;i--) if(adj[i].adj>adj[i+1].adj) adj[i].adj=adj[i+1].adj;
+  }
+  adj.sort((a,b)=>a.i-b.i);
+  const el=document.getElementById('mtRes'); el.style.display='block';
+  let rows='<tr><th>#</th><th>p raw</th><th>p adj</th><th>reject?</th></tr>';
+  let nRej=0;
+  adj.forEach((x,i)=>{
+    const rej = x.adj<alpha; if(rej) nRej++;
+    rows += `<tr><td class="key">${i+1}</td><td class="mono">${x.orig.toExponential(3)}</td><td class="mono">${x.adj.toExponential(3)}</td><td class="${rej?'accent':'muted'}">${rej?'✓':'·'}</td></tr>`;
+  });
+  el.innerHTML = `
+    <div class="kpi-row"><div class="kpi"><div class="k">method</div><div class="v">${m.toUpperCase()}</div></div><div class="kpi"><div class="k">m tests</div><div class="v">${k}</div></div><div class="kpi"><div class="k">rejected</div><div class="v accent">${nRej}</div></div></div>
+    <table style="margin-top:10px">${rows}</table>`;
+  logRun('multi.'+m, {m, k, nRej, alpha});
+}
+
+/* =========================================================
+   RATIO METRICS (Delta method)
+   ========================================================= */
+function runRatio(){
+  const Nn_a=+document.getElementById('rA_num').value, Nd_a=+document.getElementById('rA_den').value, n_a=+document.getElementById('rA_n').value;
+  const vn_a=+document.getElementById('rA_vn').value, vd_a=+document.getElementById('rA_vd').value, cov_a=+document.getElementById('rA_cov').value;
+  const Nn_b=+document.getElementById('rB_num').value, Nd_b=+document.getElementById('rB_den').value, n_b=+document.getElementById('rB_n').value;
+  const vn_b=+document.getElementById('rB_vn').value, vd_b=+document.getElementById('rB_vd').value, cov_b=+document.getElementById('rB_cov').value;
+  const alpha=+document.getElementById('rAlpha').value;
+  // means per user-level
+  const muN_a = Nn_a/n_a, muD_a = Nd_a/n_a;
+  const muN_b = Nn_b/n_b, muD_b = Nd_b/n_b;
+  const Ra = muN_a/muD_a, Rb = muN_b/muD_b;
+  // Delta method: Var(R) ≈ (1/n) * [ Var(N)/D̄² + N̄²·Var(D)/D̄⁴ − 2·N̄·Cov/D̄³ ]
+  const varRa = (vn_a/(muD_a*muD_a) + (muN_a*muN_a)*vd_a/Math.pow(muD_a,4) - 2*muN_a*cov_a/Math.pow(muD_a,3))/n_a;
+  const varRb = (vn_b/(muD_b*muD_b) + (muN_b*muN_b)*vd_b/Math.pow(muD_b,4) - 2*muN_b*cov_b/Math.pow(muD_b,3))/n_b;
+  const se = Math.sqrt(varRa + varRb);
+  const diff = Rb - Ra;
+  const z = diff/se;
+  const p = 2*(1-normCDF(Math.abs(z)));
+  const za = normInv(1-alpha/2);
+  const ci=[diff-za*se, diff+za*se];
+  const el=document.getElementById('rRes'); el.style.display='block';
+  const sig = p<alpha;
+  el.innerHTML = `
+    <div class="kpi-row">
+      <div class="kpi"><div class="k">R_A</div><div class="v">${Ra.toFixed(5)}</div></div>
+      <div class="kpi"><div class="k">R_B</div><div class="v">${Rb.toFixed(5)}</div></div>
+      <div class="kpi"><div class="k">Δ = R_B − R_A</div><div class="v accent">${diff.toFixed(5)}</div></div>
+      <div class="kpi"><div class="k">SE(Δ)</div><div class="v">${se.toFixed(5)}</div></div>
+      <div class="kpi"><div class="k">z</div><div class="v">${z.toFixed(3)}</div></div>
+      <div class="kpi"><div class="k">p-value</div><div class="v ${sig?'accent':''}">${p.toExponential(3)}</div></div>
+    </div>
+    <div class="muted" style="margin-top:8px">${(100*(1-alpha)).toFixed(0)}% CI of Δ: [${ci[0].toFixed(5)}; ${ci[1].toFixed(5)}] · lift = ${((Rb/Ra-1)*100).toFixed(3)}%</div>
+    <div class="verdict ${sig?'sig':'nosig'}" style="margin-top:12px">${sig?'✓ significant':'✗ not significant'} at α=${alpha}</div>`;
+  logRun('ratio.delta', {Ra, Rb, diff, se, z, p});
+}
+
+/* =========================================================
+   REPORT EXPORT
+   ========================================================= */
+function exportMarkdown(){
+  if(!state.log.length){alert('Log is empty'); return;}
+  let md = `# ABLab experiment report\n\n_generated: ${new Date().toISOString()}_\n\n`;
+  state.log.forEach((r,i)=>{
+    md += `## ${i+1}. ${r.kind}  \n_${r.ts}_\n\n\`\`\`json\n${JSON.stringify(r.payload, null, 2)}\n\`\`\`\n\n`;
+  });
+  downloadBlob(md, 'ablab-report.md', 'text/markdown');
+}
+function exportJson(){
+  if(!state.log.length){alert('Log is empty'); return;}
+  downloadBlob(JSON.stringify(state.log, null, 2), 'ablab-report.json', 'application/json');
+}
+function downloadBlob(content, name, type){
+  const blob = new Blob([content], {type}); const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download=name; a.click();
+  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+}
+function clearLog(){ state.log=[]; renderLog(); }
+
+// init
+populateColumnSelectors();
+renderLog();
+</script>
+</body>
+</html>
